@@ -61,12 +61,10 @@ def get_homework_statuses(current_timestamp):
         homework_statuses = requests.get(
             URL_API, headers=headers, params=params
         )
-        try:
-            homework_statuses.raise_for_status()
-            return homework_statuses.json()
-        except requests.exceptions.HTTPError as err_http:
-            logger.exception(err_http)
-            raise err_http
+        return homework_statuses.json()
+    except requests.exceptions.HTTPError as err_http:
+        logger.exception(err_http)
+        raise err_http
     except requests.RequestException as error:
         logger.exception(error)
         raise error
