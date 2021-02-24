@@ -32,20 +32,25 @@ HOMEWORK_REVIEW = 'У вас проверили работу "{arg_name}"!\n\n{a
 
 
 def parse_homework_status(homework):
-    if homework is None:
-        message = 'Проблемы с ответом от сервера.'
+    homework_name = homework.get('homework_name')
+    homework_status = homework.get('status')
+    if homework_name is None:
+        message = 'В ответе от сервера пришли пустые данные.'
         logger.error(message, exc_info=True)
-        return dict()
-    else:
-        homework_name = homework['homework_name']
-    homework_status = homework['status']
-    if homework_status in HOMEWORK_STATUSES:
+        return message
+    elif homework_status is None:
+        message = 'В ответе от сервера нет данных о статусе.'
+        logger.error(message, exc_info=True)
+        return message
+    elif homework_status in HOMEWORK_STATUSES:
         verdict = HOMEWORK_STATUSES[homework_status]
         return HOMEWORK_REVIEW.format(
             arg_name=homework_name, arg_status=verdict
         )
     else:
-        raise KeyError('Неизвестный статус!')
+        message = 'В ответе от сервера неизвестный статус!'
+        logger.error(message, exc_info=True)
+        return message
 
 
 def get_homework_statuses(current_timestamp):
@@ -76,7 +81,7 @@ def send_message(message, bot_client):
 
 def main():
     bot_client = Bot(TELEGRAM_TOKEN)
-    current_timestamp = int(time.time())
+    current_timestamp = 0#int(time.time())
     while True:
         logger.debug('Запуск telegram бота')
         try:
